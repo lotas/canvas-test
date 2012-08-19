@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+  <style type='text/css'>
+
+  /*body {-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}*/
+
+canvas {border:2px solid black; margin:10px; cursor:crosshair;}
+
+</style>
+<script type='text/javascript'>//<![CDATA[ 
+$(window).load(function(){
+var ctx, w, h, x = 150,
+    y = 150,
+    dx = 2,
+    dy = 4,
+    r=0, g=0, b=0;
+
+    var $canvas = $('canvas'),
+    	$doc = $(document);
+
+    // $canvas.width(parseInt($doc.width()) - 100);
+    // $canvas.height(parseInt($doc.height()) - 100);
+
+    ctx = $canvas[0].getContext('2d');
+    w = $canvas.width();
+    h = $canvas.height();
+
+    
+    function draw(coords) {
+        if (tool == 'circle') {
+            circle(coords.x, coords.y, radius);
+        } else if (tool == 'rect') {
+            rect(coords.x, coords.y, radius, radius);
+        } else if (tool == 'splash') {
+            for (var i = 30; i >= 0; i--) {
+                circle(
+                    coords.x + (0.5-Math.random())*30,
+                    coords.y + (0.5-Math.random())*30,
+                    Math.random()
+                );
+            };
+        }
+    }
+
+    clearCanvas();
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+
+    setInterval(drawSine, 30);
+
+
+function drawSine() {
+    var amplitude = $('#amplitude').val(),
+        frequency = $('#frequency').val(),
+        phase = $('#phase').val(),
+        y;
+
+    clearCanvas();
+    for (var x = 0; x < w; x += 0.5) {
+        y = amplitude * Math.cos(frequency * x + phase);
+
+        if (r < 256)  r++;
+        else if (g < 256) g++;
+        else if (b < 256) b++;
+        else r=g=b=0;
+
+        ctx.fillStyle = "rgba(" + r  + "," +  g + "," + b + ",0.4)";        
+        circle(x*2, w/3 - y*2, 2);
+    };
+
+    // $('#frequency').val(++frequency);
+    // $('#amplitude').val(++amplitude);
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, w, h);
+}
+
+function circle(x, y, r) {
+//    ctx.fillStyle = "rgba(" + red + "," + green + "," + blue + ",10)";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2, true);
+    ctx.fill();
+}
+
+function rect(x, y, w, h, fill) {
+    fill = fill || true;
+    ctx.beginPath();
+    if (fill) {
+        ctx.rect(x, y, w, h);
+    } else {
+        ctx.strokeRect(x, y, w, h);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
+
+
+});//]]>  
+
+</script>
+
+
+</head>
+<body>
+    <div> 
+       <label for="amplitude">Amp=</label><input type="text" size=10 value="50" id="amplitude" />
+       <label for="frequency">Freq=</label><input type="text" size=10 value="3" id="frequency" />
+       <label for="phase">Phase=</label><input type="text" size=10 value="1" id="phase" />
+    </div>
+
+    <canvas width="650" height="400"></canvas>
+
+</body>
+</html>

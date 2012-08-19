@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Prostoshop</title>
+  
+  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+
+  <style type='text/css'>
+
+  /*body {-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}*/
+
+canvas {border:2px solid black; margin:10px; cursor:crosshair;}
+
+#colors {margin:10px; float:left;}
+#colors span {display:block; height:30px; width:30px; cursor:pointer; margin-bottom:2px;}
+
+.panels {border:1px solid #ccc;}
+.panel div {float:left; margin:autho 10px; padding: 2px 4px; cursor:pointer;}
+.panel div.selected {border: 1px solid red; background:#cceeff;}
+
+</style>
+<script type='text/javascript'>//<![CDATA[ 
+$(window).load(function(){
+var ctx, w, h, x = 150,
+    y = 150,
+    dx = 2,
+    dy = 4,
+    paddleX, paddleW, paddleH, r = 0,
+    red = 0, green = 0, blue = 0,
+    radius = 10,
+    intervalId,
+    isPressed = false,
+    tool = 'circle',
+    // mouse
+    canvasMinX, canvasMaxX,
+    //bricks
+    NROWS, NCOLS, BRICKWIDTH, BRICKHEIGHT, PADDING;
+
+
+    var $canvas = $('canvas'),
+    	$doc = $(document);
+
+    // $canvas.width(parseInt($doc.width()) - 100);
+    // $canvas.height(parseInt($doc.height()) - 100);
+
+    ctx = $canvas[0].getContext('2d');
+    w = $canvas.width();
+    h = $canvas.height();
+
+    $canvas.mousemove(function(e){
+        if (!isPressed) return;
+
+        draw(adjustEventCoords(e));
+    })
+    .mousedown(function(e) {
+        isPressed = true;
+        draw(adjustEventCoords(e));
+    }) 
+    .mouseup(function(e) {
+        isPressed = false;
+    })
+    .mouseleave(function(e){
+        isPressed = false;
+    });
+
+    function adjustEventCoords(e) {
+        return {
+            x: e.offsetX,
+            y: e.offsetY
+        }
+    }
+
+    function draw(coords) {
+        if (tool == 'circle') {
+            circle(coords.x, coords.y, radius);
+        } else if (tool == 'rect') {
+            rect(coords.x, coords.y, radius, radius);
+        } else if (tool == 'splash') {
+            for (var i = 30; i >= 0; i--) {
+                circle(
+                    coords.x + (0.5-Math.random())*30,
+                    coords.y + (0.5-Math.random())*30,
+                    Math.random()
+                );
+            };
+        }
+    }
+    
+    // controls
+    $('#colors span').click(function(){
+       var clr = $(this).css('background-color')
+       ctx.fillStyle = clr; 
+       ctx.globalAlpha = 0.6;
+    });
+
+    $('.panel div').click(function(){
+        if ($(this).hasClass('selected')) return;
+        $(this).closest('.panel').find('.selected').removeClass('selected');
+        $(this).addClass('selected');
+
+        if ($(this).data('type')) {
+            tool = $(this).data('type');
+        } else if ($(this).data('size')) {
+            radius = parseInt($(this).data('size'));
+        }
+    });
+
+    clearCanvas();
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+
+
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, w, h);
+}
+
+function circle(x, y, r) {
+//    ctx.fillStyle = "rgba(" + red + "," + green + "," + blue + ",10)";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2, true);
+    ctx.fill();
+}
+
+function rect(x, y, w, h, fill) {
+    fill = fill || true;
+    ctx.beginPath();
+    if (fill) {
+        ctx.rect(x, y, w, h);
+    } else {
+        ctx.strokeRect(x, y, w, h);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
+
+
+});//]]>  
+
+</script>
+
+
+</head>
+<body>
+    <div class="panels">
+        <div id="tools" class="panel">
+            <div data-type="rect">Rectangle</div>
+            <div data-type="circle" class="selected">Circle</div>
+            <div data-type="splash">Splash</div>
+        </div>
+        <div id="sizes" class="panel">
+            <div data-size="2">Dot</div>
+            <div data-size="10">Small</div>
+            <div data-size="20">Medium</div>
+            <div data-size="30">Large</div>
+        </div>
+        <div style="clear:both"></div>
+    </div>
+
+    <div id="colors">
+        <span style="background: #000;">&nbsp;</span>    
+        <span style="background: #AAA;">&nbsp;</span>    
+        <span style="background: #F00;">&nbsp;</span>
+        <span style="background: #0F0;">&nbsp;</span>
+        <span style="background: #00F;">&nbsp;</span>        
+        <span style="background: #FF0;">&nbsp;</span>
+        <span style="background: #0FF;">&nbsp;</span>
+        <span style="background: #F0F;">&nbsp;</span>
+        <span style="background: #CC0;">&nbsp;</span>
+        <span style="background: #CCF;">&nbsp;</span>
+        <span style="background: #0CC;">&nbsp;</span>
+        <span style="background: #FCC;">&nbsp;</span>
+        <span style="background: #336699">???</span>
+    </div>
+
+    <canvas width="650" height="400"></canvas>
+  
+</body>
+</html>
